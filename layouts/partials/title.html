@@ -1,6 +1,12 @@
 {{ if .Title }}
   <hgroup>
     <h1>{{ .Title }}</h1>
+    <p style="font-size:0.9rem;">
+      {{ .Params.Author }}
+      <span style="float:right; padding-left: 1em;">
+        {{ .Date | time.Format "2006-01-02" }}
+      </span>
+    </p>
     {{ with .Params.Description }}
       <p>{{ . | markdownify }}</p>
     {{ end }}
