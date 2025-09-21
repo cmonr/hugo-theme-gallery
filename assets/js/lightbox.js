@@ -12,7 +12,12 @@ if (gallery) {
     showHideAnimationType: "zoom",
     bgOpacity: 1,
     pswpModule: PhotoSwipe,
-    imageClickAction: "close",
+
+    imageClickAction: (releasePoint, e) => {
+      window.open(pswp.currSlide.data.element.getAttribute("external-link"), "_blank");
+      return false;
+    },
+
     closeTitle: params.closeTitle,
     zoomTitle: params.zoomTitle,
     arrowPrevTitle: params.arrowPrevTitle,

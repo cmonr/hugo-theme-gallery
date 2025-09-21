@@ -1,44 +1,75 @@
 <section class="gallery">
   <div id="gallery" style="visibility: hidden; height: 1px; overflow: hidden">
-    {{ $images := slice }}
-    {{ range $image := where (.Resources.ByType "image") "Params.hidden" "ne" true }}
-      {{ $title := "" }}
-      {{ $date := "" }}
-      {{ with $image.Exif }}
-        {{ $date = .Date }}
-        {{ with .Tags.ImageDescription }}
-          {{/* Title from EXIF ImageDescription */}}
-          {{ $title = . }}
+    {{ $galleryImageList := slice }}
+    {{ $imageList := where (.Resources.ByType "image") "Params.hidden" "ne" true }}
+
+    {{ if isset .Params "gallery" }}
+      {{ $imageList = slice }}
+      {{ range $item := .Params.gallery }}
+
+        {{ if or ( hasPrefix $item "youtube" ) ( hasPrefix $item "yt" ) }}
+          {{ $data := split $item " " }}
+          {{ $id := index $data 1 }}
+          {{ $title := index $data 2 }}
+
+          {{ $thumbnailUrl := printf "%s%s%s" "https://i3.ytimg.com/vi/" $id "/maxres3.jpg" }}
+          {{ $videoUrl := printf "%s%s" "https://www.youtube.com/watch?v=" $id }}
+
+          {{ $itemRes := resources.GetRemote $thumbnailUrl }}
+
+          {{ $galleryImageList = $galleryImageList | append (dict
+            "imageRes" $itemRes 
+            "Name" $itemRes.Name
+            "Params" $itemRes.Params
+            "Title" $title
+            "extLink" $videoUrl
+            ) 
+          }}
+
+        {{ else }}
+          
+          {{ $data := split $item " " }}
+          {{ $imgPath := index $data 0 }}
+          {{ $title := index $data 1 }}
+
+          {{ $itemRes := $.Page.Resources.GetMatch $imgPath }}
+          {{ $galleryImageList = $galleryImageList | append (dict
+            "imageRes" $itemRes 
+            "Name" $itemRes.Name
+            "Params" $itemRes.Params
+            "Title" $title
+            "extLink" ""
+            ) 
+          }}
+
         {{ end }}
+
       {{ end }}
-      {{ if ne $image.Title $image.Name }}
-        {{/* Title from front matter */}}
-        {{ $title = $image.Title }}
+    {{ else }}
+      {{ range $imageRes := $imageList }}
+        {{ $galleryImageList = $galleryImageList | append (dict
+          "imageRes" $imageRes
+          "Name" $imageRes.Name
+          "Params" $imageRes.Params
+          "Title" $imageRes.Title
+          "extLink" ""
+          )
+        }}
       {{ end }}
-      {{ if $image.Params.Date }}
-        {{/* Date from front matter */}}
-        {{ $date = time $image.Params.Date }}
-      {{ end }}
-      {{ $images = $images | append (dict
-        "Name" $image.Name
-        "Title" $title
-        "Date" $date
-        "image" $image
-        "Params" $image.Params
-        )
-      }}
     {{ end }}
+
     {{ $publishResources := default true .Params.build.publishResources }}
-    {{ range sort $images (.Params.sort_by | default "Name") (.Params.sort_order | default "asc") }}
-      {{ $image := .image }}
-      {{ $thumbnail := $image.Filter (slice images.AutoOrient (images.Process "fit 600x600")) }}
-      {{ $full := $image.Filter (slice images.AutoOrient (images.Process "fit 1600x1600")) }}
+
+    {{ range $galleryImageList }}
+      {{ $imageRes := .imageRes }}
+      {{ $thumbnail := $imageRes.Filter (slice images.AutoOrient (images.Process "fit 600x600")) }}
+      {{ $full := $imageRes.Filter (slice images.AutoOrient (images.Process "fit 1600x1600")) }}
       {{ $color := index $thumbnail.Colors 0 | default "transparent" }}
-      <a class="gallery-item" href="{{ if $publishResources }}{{ $image.RelPermalink }}{{ else }}{{ $full.RelPermalink }}{{ end }}" data-pswp-src="{{ $full.RelPermalink }}" data-pswp-width="{{ $full.Width }}" data-pswp-height="{{ $full.Height }}" data-pswp-target="{{ $image.Name | urlize }}" title="{{ .Title }}" itemscope itemtype="https://schema.org/ImageObject" style="aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
+      <a class="gallery-item" href="{{ if $publishResources }}{{ $imageRes.RelPermalink }}{{ else }}{{ $full.RelPermalink }}{{ end }}" data-pswp-src="{{ $full.RelPermalink }}" data-pswp-width="{{ $full.Width }}" data-pswp-height="{{ $full.Height }}" data-pswp-target="{{ $imageRes.Name | urlize }}" title="{{ .Title }}" itemscope itemtype="https://schema.org/ImageObject" style="aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}" external-link="{{ .extLink }}">
         <figure style="background-color: {{ $color }}; aspect-ratio: {{ $thumbnail.Width }} / {{ $thumbnail.Height }}">
           <img class="lazyload" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" data-src="{{ $thumbnail.RelPermalink }}" alt="{{ .Title }}" />
         </figure>
-        <meta itemprop="contentUrl" content="{{ if $publishResources }}{{ $image.RelPermalink }}{{ else }}{{ $full.RelPermalink }}{{ end }}" />
+        <meta itemprop="contentUrl" content="{{ if $publishResources }}{{ $imageRes.RelPermalink }}{{ else }}{{ $full.RelPermalink }}{{ end }}" />
         {{ with site.Params.Author }}
           <span itemprop="creator" itemtype="https://schema.org/Person" itemscope>
             <meta itemprop="name" content="{{ site.Params.Author.name }}" />
@@ -48,3 +79,4 @@
     {{ end }}
   </div>
 </section>
+
