@@ -14,7 +14,10 @@ if (gallery) {
     pswpModule: PhotoSwipe,
 
     imageClickAction: (releasePoint, e) => {
-      window.open(pswp.currSlide.data.element.getAttribute("external-link"), "_blank");
+      extLink = pswp.currSlide.data.element.getAttribute("external-link");
+      if(extLink) {
+        window.open(pswp.currSlide.data.element.getAttribute("external-link"), "_blank");
+      }
       return false;
     },
 
