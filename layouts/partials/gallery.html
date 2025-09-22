@@ -8,8 +8,8 @@
       {{ range $item := .Params.gallery }}
 
         {{ if or ( hasPrefix $item "youtube" ) ( hasPrefix $item "yt" ) }}
-          {{ $data := split $item " " }}
-          {{ $id := index $data 1 }}
+          {{ $data := split $item "|" }}
+          {{ $id := strings.TrimSpace (index $data 1) }}
           {{ $title := index $data 2 }}
 
           {{ $thumbnailUrl := printf "%s%s%s" "https://i3.ytimg.com/vi/" $id "/maxres3.jpg" }}
@@ -28,8 +28,8 @@
 
         {{ else }}
           
-          {{ $data := split $item " " }}
-          {{ $imgPath := index $data 0 }}
+          {{ $data := split $item "|" }}
+          {{ $imgPath := strings.TrimSpace (index $data 0) }}
           {{ $title := index $data 1 }}
 
           {{ $itemRes := $.Page.Resources.GetMatch $imgPath }}
