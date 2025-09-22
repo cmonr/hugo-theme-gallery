@@ -12,10 +12,8 @@
           {{ $id := strings.TrimSpace (index $data 1) }}
           {{ $title := index $data 2 }}
 
-          {{ $thumbnailUrl := printf "%s%s%s" "https://i3.ytimg.com/vi/" $id "/maxres3.jpg" }}
           {{ $videoUrl := printf "%s%s" "https://www.youtube.com/watch?v=" $id }}
-
-          {{ $itemRes := resources.GetRemote $thumbnailUrl }}
+          {{ $itemRes := partial "srcVideoThumbnail.youtube.html" $id }}
 
           {{ $galleryImageList = $galleryImageList | append (dict
             "imageRes" $itemRes 

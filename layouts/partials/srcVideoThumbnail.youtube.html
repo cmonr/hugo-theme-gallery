@@ -1,0 +1,39 @@
+{{/* Youtube Video ID is param */}}
+{{ $videoId := . }}
+{{ $oauthToken := getenv "YOUTUBE_OAUTH_TOKEN" }}
+
+{{ if eq $oauthToken "" }}
+  {{ errorf "Unable to source Youtube's OAuth Token from Env" }}
+{{ end }}
+
+
+{{ $apiUrl := printf "%s%s%s" "https://www.googleapis.com/youtube/v3/videos?id=" $videoId "&part=snippet" }}
+{{ $opts := dict
+  "headers" (dict "Authorization" (printf "%s%s" "Bearer " $oauthToken) )
+}}
+
+{{ $data := dict }}
+{{ with try (resources.GetRemote $apiUrl $opts) }}
+  {{ with .Err }}
+    {{ errorf "%s" . }}
+  {{ else with .Value }}
+    {{ $data = . | transform.Unmarshal }}
+  {{ else }}
+    {{ errorf "Unable to get remote resource %q" $apiUrl }}
+  {{ end }}
+{{ end }}
+
+
+{{ $thumbnailUrl := index (index (index (index (index (index $data "items") 0) "snippet") "thumbnails") "maxres") "url" }} 
+
+{{ with try ( resources.GetRemote $thumbnailUrl ) }}
+  {{ with .Err }}
+    {{ errorf "%s" . }}
+  {{ else with .Value }}
+    {{ warnf "Fetched video thumbnail (@ %s)" $thumbnailUrl }}
+    {{ return resources.GetRemote $thumbnailUrl }}
+  {{ else }}
+    {{ errorf "Unable to get remote resource %q" $thumbnailUrl }}
+  {{ end }}
+{{ end }}
+
