@@ -8,11 +8,13 @@
 
 <i class="
 {{ $faStylePrefix }}
-{{ range $iconName := .Params }}
-  {{ if hasPrefix $iconName "style " }}
-    {{ $customStyle = slicestr $iconName 6 }}
+{{ range .Params }}
+  {{ if hasPrefix . "class " }}
+    {{ slicestr . 6 }}
+  {{ else if hasPrefix . "style " }}
+    {{ $customStyle = slicestr . 6 }}
   {{ else }}
-    fa-{{ $iconName }}
+    fa-{{ . }}
   {{ end }} 
 {{ end }}" 
 
