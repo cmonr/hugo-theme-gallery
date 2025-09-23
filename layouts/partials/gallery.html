@@ -13,7 +13,12 @@
           {{ $title := index $data 2 }}
 
           {{ $videoUrl := printf "%s%s" "https://www.youtube.com/watch?v=" $id }}
-          {{ $itemRes := partial "srcVideoThumbnail.youtube.html" $id }}
+          
+          {{ $imgPath := printf "%s.thumbnail.jpg" $id }}
+          {{ $itemRes := $.Page.Resources.GetMatch $imgPath }}
+          {{ if eq $itemRes nil }}
+            {{ $itemRes = partial "srcVideoThumbnail.html" ( dict "context" $.Page "videoId" $id "provider" "youtube") }}
+          {{ end }}
 
           {{ $galleryImageList = $galleryImageList | append (dict
             "imageRes" $itemRes 

@@ -1,5 +1,8 @@
-{{/* Youtube Video ID is param */}}
-{{ $videoId := . }}
+{{/*{ Params: context, videoId, provider */}}
+
+{{ $videoId := .videoId }}
+{{ $context := .context }}
+
 {{ $oauthToken := getenv "YOUTUBE_OAUTH_TOKEN" }}
 
 {{ if eq $oauthToken "" }}
@@ -30,7 +33,7 @@
   {{ with .Err }}
     {{ errorf "%s" . }}
   {{ else with .Value }}
-    {{ warnf "Fetched video thumbnail (@ %s)" $thumbnailUrl }}
+    {{ warnf "Fetched video thumbnail (in '%s' @ %s)" $context.File.Dir $thumbnailUrl }}
     {{ return resources.GetRemote $thumbnailUrl }}
   {{ else }}
     {{ errorf "Unable to get remote resource %q" $thumbnailUrl }}
