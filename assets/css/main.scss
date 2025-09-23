@@ -3,7 +3,7 @@
 @import "styles";
 @import "photoswipe/photoswipe";
 @import "photoswipe/photoswipe-dynamic-caption-plugin";
-@import "custom";
+@import "theme.custom";
 
 .lazyload,
 .lazyloading {
@@ -18,3 +18,4 @@
 img.lazyload:not([src]) {
   visibility: hidden;
 }
+

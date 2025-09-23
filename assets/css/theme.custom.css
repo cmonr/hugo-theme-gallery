@@ -1,0 +1,35 @@
+.pswp__youtube-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pswp__youtube-play-icon span i {
+  opacity: 60%;
+  color: #000;
+}
+
+.pswp__youtube-play-icon:hover span i {
+  opacity: 100%;
+  color: #f00;
+  transition: color 0.5s, opacity 0.5s;
+}
+
+.pswp__youtube-play-icon span p {
+  text-align: center;
+  color: #fff;
+  opacity: 100%;
+  padding-left: 0.15em;
+  scale: 0.75;
+}
+
+
+/* override zoom cursor */
+.pswp__img {
+  cursor: pointer !important;
+}
+
+.pswp--zoom-allowed .pswp__img {
+    cursor: default !important
+}

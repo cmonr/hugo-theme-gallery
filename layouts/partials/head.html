@@ -34,7 +34,7 @@
     "targetRowHeightTolerance" (default 0.25 .Site.Params.gallery.targetRowHeightTolerance)
     "enableDownload" (default true .Params.build.publishResources)
   }}
-  {{ $js := resources.Get "js/main.js" | js.Build (dict "minify" true "params" $params) | resources.Fingerprint }}
+  {{ $js := resources.Get "js/main.js" | js.Build (dict "minify" true "params" $params) | fingerprint }}
   <script src="{{ $js.RelPermalink }}" defer></script>
   {{- partial "head-custom.html" . -}}
 </head>

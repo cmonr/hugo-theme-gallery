@@ -9,56 +9,67 @@ if (gallery) {
   const lightbox = new PhotoSwipeLightbox({
     gallery,
     children: ".gallery-item",
-    showHideAnimationType: "zoom",
+    showHideAnimationType: "none",
     bgOpacity: 1,
     pswpModule: PhotoSwipe,
 
     imageClickAction: (releasePoint, e) => {
       extLink = pswp.currSlide.data.element.getAttribute("external-link");
       if(extLink) {
-        window.open(pswp.currSlide.data.element.getAttribute("external-link"), "_blank");
+        window.open(extLink, "_blank");
       }
       return false;
     },
 
     closeTitle: params.closeTitle,
-    zoomTitle: params.zoomTitle,
     arrowPrevTitle: params.arrowPrevTitle,
     arrowNextTitle: params.arrowNextTitle,
     errorMsg: params.errorMsg,
+
+    zoom: false,
   });
 
-  if (params.enableDownload) {
-    lightbox.on("uiRegister", () => {
-      lightbox.pswp.ui.registerElement({
-        name: "download-button",
-        order: 8,
-        isButton: true,
-        tagName: "a",
-        html: {
-          isCustomSVG: true,
-          inner: '<path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 16l6 6.1 6-6.1ZM23 23H9v2h14Z" id="pswp__icn-download"/>',
-          outlineID: "pswp__icn-download",
-        },
-        onInit: (el, pswp) => {
-          el.setAttribute("download", "");
-          el.setAttribute("target", "_blank");
-          el.setAttribute("rel", "noopener");
-          el.setAttribute("title", params.downloadTitle || "Download");
-          pswp.on("change", () => {
-            el.href = pswp.currSlide.data.element.href;
-          });
-        },
-      });
+  lightbox.on("uiRegister", () => {
+    lightbox.pswp.ui.registerElement({
+      name: "youtube-play-icon",
+      order: 8,
+      isButton: false,
+      tagName: "a",
+      appendTo: "root", 
+      html: '<span class="fa-stack fa-3x" aria-hidden="true"><i class="fa-brands fa-youtube youtube-icon fa-stack-2x"></i><p class="fa-stack-1x">▶ </p></span>'
     });
-  }
+  });
 
   lightbox.on("change", () => {
     const target = lightbox.pswp.currSlide?.data?.element?.dataset["pswpTarget"];
     history.replaceState("", document.title, "#" + target);
-  });
 
+    playIcon = document.getElementsByClassName("pswp__youtube-play-icon")[0];
+    extLink = pswp.currSlide.data.element.getAttribute("external-link");
+
+    if(extLink) {
+      playIcon.setAttribute("target", "_blank");
+      playIcon.setAttribute("rel", "noopener");
+      playIcon.href = extLink;
+      playIcon.style.visibility="visible";
+    } else {
+      playIcon.style.visibility="hidden";
+      playIcon.removeAttribute("target");
+      playIcon.removeAttribute("rel");
+      playIcon.removeAttribute("href");
+    }
+  });
+  
   lightbox.on("close", () => {
+    lightbox.on("change", () => {});
+
+    playIcon = document.getElementsByClassName("pswp__youtube-play-icon")[0];
+    extLink = pswp.currSlide.data.element.getAttribute("external-link");
+    
+    playIcon.style.visibility="hidden";
+    playIcon.removeAttribute("target");
+    playIcon.removeAttribute("rel");
+
     history.replaceState("", document.title, window.location.pathname);
   });
 
