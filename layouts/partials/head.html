@@ -21,7 +21,8 @@
   {{ partial "opengraph.html" . }}
   {{ $css := resources.Get "/css/main.scss" | toCSS | minify | fingerprint }}
   <link rel="stylesheet" type="text/css"  href="{{ $css.RelPermalink }}" />
-  <link rel="stylesheet" type="text/css" href="/fontawesome/css/all.min.css" />
+  {{ $fa := resources.Get "/fontawesome/css/all.min.css" | fingerprint }}
+  <link rel="stylesheet" type="text/css" href="{{ $fa.RelPermalink }}" />
   {{ $params := dict
     "closeTitle" (i18n "closeTitle")
     "zoomTitle" (i18n "zoomTitle")
